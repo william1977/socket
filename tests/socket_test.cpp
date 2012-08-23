@@ -8,6 +8,9 @@ int main()
     
     SocketWrapper* socket = new SocketWrapper;
 
+    socket->bind(8000);
+    socket->listen();
+
     delete socket;
 
     _LOGV("End test\n");
