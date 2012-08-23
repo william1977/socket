@@ -5,6 +5,8 @@
 #include <errno.h>
 #include <string.h>
 #include <netinet/in.h>
+#include <unistd.h>
+#include <fcntl.h>
 
 #include <wrapper/socket.h>
 
@@ -81,8 +83,32 @@ bool SocketWrapper::send(const void *buf, size_t len, ssize_t* write_len, int fl
     return SET_ERROR(ret);
 }
 
+bool SocketWrapper::fcntl(int cmd, int arg, int* out_arg)
+{
+    int ret = ::fcntl(sockfd, cmd, arg);
+    LOGV("fcntl(sockfd:%d, cmd:%d, arg:%d) return %d", sockfd, cmd, arg, ret);
+    if (out_arg != NULL) {
+        *out_arg = ret;
+    }
+    return SET_ERROR(ret);
+}
+
+bool SocketWrapper::setNonBlock()
+{
+    int flags;
+    if (!fcntl (F_GETFL, 0, &flags)) {
+        return false;
+    }
+    
+    flags |= O_NONBLOCK;
+    return fcntl (F_SETFL, flags);
+}
+
 bool SocketWrapper::close()
 {
+    if(sockfd == -1){
+        return true;
+    }
     int ret = ::close(sockfd);
     LOGV("close(sockfd:%d) return %d", sockfd, ret);
     if(ret == 0){

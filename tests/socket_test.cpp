@@ -8,6 +8,7 @@ int main()
     _LOGV("Begin test\n");
     
     IPSocket* socket = new IPSocket;
+    socket->setNonBlock();
 
     socket->create();
     socket->bind(8000);
@@ -15,6 +16,7 @@ int main()
 
     IPSocket* client = new IPSocket;
     socket->accept(client);
+    client->setNonBlock();
 
     char buf[65535];
     memset(buf, 0, sizeof(buf));

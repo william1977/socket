@@ -20,6 +20,8 @@ public:
     bool accept(SocketWrapper* socket, struct sockaddr *addr, socklen_t *addrlen);
     bool recv(void *buf, size_t len, ssize_t* read_len, int flags = 0);
     bool send(const void *buf, size_t len, ssize_t* write_len, int flags = 0);
+    bool fcntl(int cmd, int arg, int* out_arg = NULL);
+    bool setNonBlock();
 
     bool close();
 
