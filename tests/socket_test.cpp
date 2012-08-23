@@ -20,10 +20,13 @@ int main()
     memset(buf, 0, sizeof(buf));
     ssize_t read_len;
     client->recv(buf, sizeof(buf), &read_len);
-    _LOGV("Receive : %s \n", buf);
+    _LOGV("Receive : [%d]%s \n", read_len, buf);
 
     sprintf(buf, "HTTP/1.1 200 OK\r\n\r\n");
     client->send(buf, strlen(buf), &read_len);
+
+    client->recv(buf, sizeof(buf), &read_len);
+    _LOGV("Receive : [%d]%s \n", read_len, buf);
 
     client->close();
     delete client;
