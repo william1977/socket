@@ -56,18 +56,41 @@ bool SocketWrapper::listen(int backlog)
 bool SocketWrapper::accept(SocketWrapper* socket, struct sockaddr *addr, socklen_t *addrlen)
 {
     int fd = ::accept(sockfd, addr, addrlen);
-    LOGV("accept(sockfd:%d, addr:%p, addrlen:%d) return sockfd:%d", sockfd, addr, addrlen, fd);
+    LOGV("accept(sockfd:%d, addr:%p, addrlen:%d) return sockfd:%d", sockfd, addr, *addrlen, fd);
     socket->sockfd = fd;
     return SET_ERROR(fd);
+}
+
+bool SocketWrapper::recv(void *buf, size_t len, ssize_t* read_len, int flags)
+{
+    ssize_t ret = ::recv(sockfd, buf, len, flags);
+    LOGV("recv(sockfd:%d, buf:%p, len:%d, flags:%d) return %d", sockfd, buf, len, flags, ret);
+    *read_len = ret;
+    if(ret == 0){
+        LOGW("[%d]The return value will be 0 when the peer  has  performed  an  orderly shutdown.", sockfd);
+        close();
+    }
+    return SET_ERROR(ret);
+}
+
+bool SocketWrapper::send(const void *buf, size_t len, ssize_t* write_len, int flags)
+{
+    ssize_t ret = ::send(sockfd, buf, len, flags);
+    LOGV("send(sockfd:%d, buf:%p, len:%d, flags:%d) return %d", sockfd, buf, len, flags, ret);
+    *write_len = ret;
+    return SET_ERROR(ret);
 }
 
 bool SocketWrapper::close()
 {
     int ret = ::close(sockfd);
     LOGV("close(sockfd:%d) return %d", sockfd, ret);
+    if(ret == 0){
+        sockfd = -1;
+    }
     return SET_ERROR(ret);
 }
-
+/*
 bool SocketWrapper::bind(int listen_port)
 {
     struct sockaddr_in my_addr;
@@ -84,5 +107,21 @@ bool SocketWrapper::accept(SocketWrapper* socket)
     memset(&my_addr, 0, sizeof(my_addr));
     socklen_t addrlen = sizeof(my_addr);
     return accept(socket, (struct sockaddr *)&my_addr, &addrlen);
+}
+*/
+bool IPSocket::bind(int listen_port)
+{
+    memset(&addr, 0, sizeof(addr));
+    addr.sin_family = AF_INET;
+    addr.sin_port = htons(listen_port);
+    addr.sin_addr.s_addr = INADDR_ANY;
+    return SocketWrapper::bind((const sockaddr*)&addr, sizeof(addr));
+}
+
+bool IPSocket::accept(IPSocket* socket)
+{
+    memset(&socket->addr, 0, sizeof(socket->addr));
+    socklen_t addrlen = sizeof(socket->addr);
+    return SocketWrapper::accept(socket, (struct sockaddr *)&socket->addr, &addrlen);
 }
 

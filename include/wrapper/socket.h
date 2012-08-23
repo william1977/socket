@@ -2,6 +2,7 @@
 #define _SOCKET_WRAPPER_H_
 
 #include <sys/socket.h>
+#include <netinet/in.h>
 
 #include "error.h"
 
@@ -17,12 +18,14 @@ public:
     bool bind(const struct sockaddr *addr, socklen_t addrlen);
     bool listen(int backlog = 255);
     bool accept(SocketWrapper* socket, struct sockaddr *addr, socklen_t *addrlen);
+    bool recv(void *buf, size_t len, ssize_t* read_len, int flags = 0);
+    bool send(const void *buf, size_t len, ssize_t* write_len, int flags = 0);
 
     bool close();
 
-public:
-    bool bind(int listen_port);
-    bool accept(SocketWrapper* socket);
+//public:
+  //  bool bind(int listen_port);
+  //  bool accept(SocketWrapper* socket);
 
 public:
     bool isValid() {return sockfd != -1;}
@@ -31,6 +34,16 @@ public:
 private:
     bool setError(int ret, const char* function, int line);
     Error error;
+};
+
+class IPSocket : public SocketWrapper {
+public:
+    bool bind(int listen_port);
+    bool accept(IPSocket* socket);
+
+private:
+    struct sockaddr_in addr;
+
 };
 
 #endif //_SOCKET_WRAPPER_H_
