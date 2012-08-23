@@ -8,8 +8,14 @@ int main()
     
     SocketWrapper* socket = new SocketWrapper;
 
+    socket->create();
     socket->bind(8000);
     socket->listen();
+
+    SocketWrapper* client = new SocketWrapper;
+    socket->accept(client);
+
+    delete client;
 
     delete socket;
 

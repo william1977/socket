@@ -10,12 +10,17 @@
 
 #define SET_ERROR(rc) setError(rc, __FUNCTION__, __LINE__)
 
-SocketWrapper::SocketWrapper(int domain, int type, int protocol)
+SocketWrapper::SocketWrapper(int fd)
+{
+    sockfd = fd;
+}
+
+bool SocketWrapper::create(int domain, int type, int protocol)
 {
     LOGV("construct size : %d", sizeof(SocketWrapper));
     sockfd = socket(domain, type, protocol);
     LOGV("socket(domain:%d, type:%d, protocol:%d) return sockfd:%d", domain, type, protocol, sockfd);
-    SET_ERROR(sockfd);
+    return SET_ERROR(sockfd);
 }
 
 bool SocketWrapper::setError(int ret, const char* function, int line)
@@ -57,6 +62,22 @@ bool SocketWrapper::listen(int backlog)
     int ret = ::listen(sockfd, backlog);
     LOGV("listen(sockfd:%d, backlog:%d) return %d", sockfd, backlog, ret);
     return SET_ERROR(ret);
+}
+
+bool SocketWrapper::accept(SocketWrapper* socket)
+{
+    struct sockaddr_in my_addr;
+    memset(&my_addr, 0, sizeof(my_addr));
+    socklen_t addrlen = sizeof(my_addr);
+    return accept(socket, (struct sockaddr *)&my_addr, &addrlen);
+}
+
+bool SocketWrapper::accept(SocketWrapper* socket, struct sockaddr *addr, socklen_t *addrlen)
+{
+    int fd = ::accept(sockfd, addr, addrlen);
+    LOGV("accept(sockfd:%d, addr:%p, addrlen:%d) return sockfd:%d", sockfd, addr, addrlen, fd);
+    socket->sockfd = fd;
+    return SET_ERROR(fd);
 }
 
 bool SocketWrapper::close()
