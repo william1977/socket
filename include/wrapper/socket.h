@@ -15,7 +15,7 @@ public:
 
 public:
     bool isValid() {return sockfd != -1;}
-    Error* getLastError() {return &error;}
+    Error getLastError() {return error;}
 
 private:
     Error error;
