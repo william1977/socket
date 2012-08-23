@@ -6,7 +6,9 @@ int main()
 {
     _LOGV("Begin test\n");
     
-    SocketWrapper socket;
+    SocketWrapper* socket = new SocketWrapper;
+
+    delete socket;
 
     _LOGV("End test\n");
 
