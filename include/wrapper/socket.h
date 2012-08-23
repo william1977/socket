@@ -10,7 +10,7 @@ private:
     int sockfd;
     
 public:
-    SocketWrapper(int fd = -1);
+    SocketWrapper();
     ~SocketWrapper();
 
     bool create(int domain = AF_INET, int type = SOCK_STREAM, int protocol = 0);

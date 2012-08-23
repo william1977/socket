@@ -10,9 +10,9 @@
 
 #define SET_ERROR(rc) setError(rc, __FUNCTION__, __LINE__)
 
-SocketWrapper::SocketWrapper(int fd)
+SocketWrapper::SocketWrapper()
 {
-    sockfd = fd;
+    sockfd = -1;
 }
 
 bool SocketWrapper::create(int domain, int type, int protocol)
@@ -36,7 +36,6 @@ bool SocketWrapper::setError(int ret, const char* function, int line)
 
 SocketWrapper::~SocketWrapper()
 {
-    close();
     LOGV("destruct size : %d", sizeof(SocketWrapper));
 }
 
@@ -47,29 +46,11 @@ bool SocketWrapper::bind(const struct sockaddr *addr, socklen_t addrlen)
     return SET_ERROR(ret);
 }
 
-bool SocketWrapper::bind(int listen_port)
-{
-    struct sockaddr_in my_addr;
-    memset(&my_addr, 0, sizeof(my_addr));
-    my_addr.sin_family = AF_INET;
-    my_addr.sin_port = htons(listen_port);
-    my_addr.sin_addr.s_addr = INADDR_ANY;
-    return bind((const sockaddr*)&my_addr, sizeof(my_addr));
-}
-
 bool SocketWrapper::listen(int backlog)
 {
     int ret = ::listen(sockfd, backlog);
     LOGV("listen(sockfd:%d, backlog:%d) return %d", sockfd, backlog, ret);
     return SET_ERROR(ret);
-}
-
-bool SocketWrapper::accept(SocketWrapper* socket)
-{
-    struct sockaddr_in my_addr;
-    memset(&my_addr, 0, sizeof(my_addr));
-    socklen_t addrlen = sizeof(my_addr);
-    return accept(socket, (struct sockaddr *)&my_addr, &addrlen);
 }
 
 bool SocketWrapper::accept(SocketWrapper* socket, struct sockaddr *addr, socklen_t *addrlen)
@@ -85,5 +66,23 @@ bool SocketWrapper::close()
     int ret = ::close(sockfd);
     LOGV("close(sockfd:%d) return %d", sockfd, ret);
     return SET_ERROR(ret);
+}
+
+bool SocketWrapper::bind(int listen_port)
+{
+    struct sockaddr_in my_addr;
+    memset(&my_addr, 0, sizeof(my_addr));
+    my_addr.sin_family = AF_INET;
+    my_addr.sin_port = htons(listen_port);
+    my_addr.sin_addr.s_addr = INADDR_ANY;
+    return bind((const sockaddr*)&my_addr, sizeof(my_addr));
+}
+
+bool SocketWrapper::accept(SocketWrapper* socket)
+{
+    struct sockaddr_in my_addr;
+    memset(&my_addr, 0, sizeof(my_addr));
+    socklen_t addrlen = sizeof(my_addr);
+    return accept(socket, (struct sockaddr *)&my_addr, &addrlen);
 }
 

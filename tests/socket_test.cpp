@@ -15,8 +15,10 @@ int main()
     SocketWrapper* client = new SocketWrapper;
     socket->accept(client);
 
+    client->close();
     delete client;
 
+    socket->close();
     delete socket;
 
     _LOGV("End test\n");
