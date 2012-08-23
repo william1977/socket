@@ -22,7 +22,8 @@ int main()
     client->recv(buf, sizeof(buf), &read_len);
     _LOGV("Receive : [%d]%s \n", read_len, buf);
 
-    sprintf(buf, "HTTP/1.1 200 OK\r\n\r\n");
+    const char* body = "abcd";
+    sprintf(buf, "HTTP/1.1 200 OK\r\nContent-Type: text/html; charset=UTF-8\r\nContent-Length: %d\r\n\r\n%s", strlen(body), body);
     client->send(buf, strlen(buf), &read_len);
 
     client->recv(buf, sizeof(buf), &read_len);
