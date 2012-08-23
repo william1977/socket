@@ -8,9 +8,9 @@ int main()
     _LOGV("Begin test\n");
     
     IPSocket* socket = new IPSocket;
-    socket->setNonBlock();
-
     socket->create();
+    socket->setNonBlock();
+    
     socket->bind(8000);
     socket->listen();
 
