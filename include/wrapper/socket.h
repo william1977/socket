@@ -4,6 +4,7 @@
 class SocketWrapper {
 public:
     SocketWrapper();
+    ~SocketWrapper();
 };
 
 #endif //_SOCKET_WRAPPER_H_
