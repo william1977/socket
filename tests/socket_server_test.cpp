@@ -22,8 +22,11 @@ void test_socket_server()
     char buf[65535];
     memset(buf, 0, sizeof(buf));
     ssize_t read_len;
-    client->recv(buf, sizeof(buf), &read_len);
+    bool ret = client->recv(buf, sizeof(buf), &read_len);
     _LOGV("Receive : [%d]\n[%s]\n", read_len, buf);
+    if(ret && read_len == 0){
+        client->close();
+    }
 
     const char* body = "abcd";
     sprintf(buf, "HTTP/1.1 200 OK\r\nContent-Type: text/html; charset=UTF-8\r\nContent-Length: %d\r\n\r\n%s", strlen(body), body);
@@ -70,8 +73,11 @@ void TestSocketListener::onReadReady(SocketWrapper* socket)
     char buf[65535];
     memset(buf, 0, sizeof(buf));
     ssize_t read_len;
-    socket->recv(buf, sizeof(buf), &read_len);
+    bool ret = socket->recv(buf, sizeof(buf), &read_len);
     _LOGV("Receive : [%d]\n[%s]\n", read_len, buf);
+    if(ret && read_len == 0){
+        socket->close();
+    }
 
     const char* body = "abcd";
     sprintf(buf, "HTTP/1.1 200 OK\r\nContent-Type: text/html; charset=UTF-8\r\nContent-Length: %d\r\n\r\n%s", strlen(body), body);
@@ -87,6 +93,8 @@ public:
     virtual void onClientConnect(SocketWrapper* socket);
     virtual void onReadReady(SocketWrapper* socket){}
     virtual void onWriteReady(SocketWrapper* socket){}
+
+    void onClientDisconnect(TestSocketListener* socketListener);
     
     TestServerListener(SelectWrapper* select, IPSocket* socket){this->select = select; server = socket;}
     ~TestServerListener();

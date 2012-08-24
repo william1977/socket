@@ -78,7 +78,7 @@ bool SocketWrapper::recv(void *buf, size_t len, ssize_t* read_len, int flags)
     *read_len = ret;
     if(ret == 0){
         LOGW("[%d]The return value will be 0 when the peer  has  performed  an  orderly shutdown.", sockfd);
-        close();
+        //close();
     }
     return SET_ERROR(ret);
 }
