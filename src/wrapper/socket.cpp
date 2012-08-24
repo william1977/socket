@@ -19,8 +19,6 @@
 SocketWrapper::SocketWrapper()
 {
     sockfd = -1;
-    async = false;
-    listener = NULL;
 }
 
 bool SocketWrapper::create(int domain, int type, int protocol)
@@ -107,8 +105,7 @@ bool SocketWrapper::setNonBlock()
     }
     
     flags |= O_NONBLOCK;
-    async = fcntl (F_SETFL, flags);
-    return async;
+    return fcntl (F_SETFL, flags);
 }
 
 bool SocketWrapper::connect(const struct sockaddr *addr, socklen_t addrlen)
@@ -175,5 +172,15 @@ bool IPSocket::connect(const char* address, int port)
     peer_addr.sin_port = htons(port);
     peer_addr.sin_addr.s_addr = inet_addr(address);
     return SocketWrapper::connect((const sockaddr*)&peer_addr, sizeof(addr));
+}
+
+AnsycSocket::AnsycSocket()
+{
+    listener = NULL;
+}
+
+void AnsycSocket::setSocketListener(SocketListener* socketListener)
+{
+    listener = socketListener;
 }
 
