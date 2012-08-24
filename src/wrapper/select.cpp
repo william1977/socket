@@ -87,59 +87,59 @@ bool SelectWrapper::select(struct timeval *timeout)
     return SET_ERROR(ret);
 }
 
-bool SelectWrapper::addToRead(SocketWrapper*socket)
+bool SelectWrapper::addToRead(AnsycSocket*socket)
 {
     //FD_SET(socket->sockfd, &readfds);
     return add(reads, socket);
 }
 
-bool SelectWrapper::removeFromRead(SocketWrapper*socket)
+bool SelectWrapper::removeFromRead(AnsycSocket*socket)
 {
     //FD_CLR(socket->sockfd, &readfds);
     return remove(reads, socket);
 }
 
-bool SelectWrapper::isReadable(SocketWrapper*socket)
+bool SelectWrapper::isReadable(AnsycSocket*socket)
 {
  //   return FD_ISSET(socket->sockfd, &readfds);
 }
       
-bool SelectWrapper::addToWrite(SocketWrapper*socket)
+bool SelectWrapper::addToWrite(AnsycSocket*socket)
 {
     //FD_SET(socket->sockfd, &writefds);
     return add(writes, socket);
 }
 
-bool SelectWrapper::removeFromWrite(SocketWrapper*socket)
+bool SelectWrapper::removeFromWrite(AnsycSocket*socket)
 {
     //FD_CLR(socket->sockfd, &writefds);
     return remove(writes, socket);
 }
 
-bool SelectWrapper::isWritable(SocketWrapper*socket)
+bool SelectWrapper::isWritable(AnsycSocket*socket)
 {
    // return FD_ISSET(socket->sockfd, &writefds);
 }
 
       
-bool SelectWrapper::addToExcept(SocketWrapper*socket)
+bool SelectWrapper::addToExcept(AnsycSocket*socket)
 {
     //FD_SET(socket->sockfd, &exceptfds);
     return add(excepts, socket);
 }
 
-bool SelectWrapper::removeFromExcept(SocketWrapper*socket)
+bool SelectWrapper::removeFromExcept(AnsycSocket*socket)
 {
     //FD_CLR(socket->sockfd, &exceptfds);
     return remove(excepts, socket);
 }
 
-bool SelectWrapper::isExcept(SocketWrapper*socket)
+bool SelectWrapper::isExcept(AnsycSocket*socket)
 {
    // return FD_ISSET(socket->sockfd, &exceptfds);
 }
 
-bool SelectWrapper::add(std::vector<SocketWrapper*>& collection, SocketWrapper*socket)
+bool SelectWrapper::add(std::vector<AnsycSocket*>& collection, AnsycSocket*socket)
 {
     int size = collection.size();
     for (int i = 0; i < size; i++) {
@@ -151,7 +151,7 @@ bool SelectWrapper::add(std::vector<SocketWrapper*>& collection, SocketWrapper*s
     return true;
 }
 
-bool SelectWrapper::remove(std::vector<SocketWrapper*>& collection, SocketWrapper*socket)
+bool SelectWrapper::remove(std::vector<AnsycSocket*>& collection, AnsycSocket*socket)
 {
     int size = collection.size();
     for (int i = 0; i < size; i++) {
@@ -163,7 +163,7 @@ bool SelectWrapper::remove(std::vector<SocketWrapper*>& collection, SocketWrappe
     return true;
 }
 
-int SelectWrapper::getMaxfd(std::vector<SocketWrapper*>& collection, int nfds, fd_set* fds)
+int SelectWrapper::getMaxfd(std::vector<AnsycSocket*>& collection, int nfds, fd_set* fds)
 {
     int maxfd = nfds;
     int size = collection.size();
@@ -176,39 +176,42 @@ int SelectWrapper::getMaxfd(std::vector<SocketWrapper*>& collection, int nfds, f
     return maxfd;
 }
 
-int SelectWrapper::checkRead(std::vector<SocketWrapper*>& collection, fd_set* fds)
+int SelectWrapper::checkRead(std::vector<AnsycSocket*>& collection, fd_set* fds)
 {
     int count = 0;
     int size = collection.size();
     for (int i = 0; i < size; i++) {
         if (FD_ISSET(collection[i]->sockfd, fds)) {
-            LOGV("Read ready : %d", collection[i]->sockfd);
+            LOGV("Read ready : [%p]%d", collection[i], collection[i]->sockfd);
+            collection[i]->onRead();
             count++;
         }
     }
     return count;
 }
 
-int SelectWrapper::checkWrite(std::vector<SocketWrapper*>& collection, fd_set* fds)
+int SelectWrapper::checkWrite(std::vector<AnsycSocket*>& collection, fd_set* fds)
 {
     int count = 0;
     int size = collection.size();
     for (int i = 0; i < size; i++) {
         if (FD_ISSET(collection[i]->sockfd, fds)) {
-            LOGV("Write ready : %d", collection[i]->sockfd);
+            LOGV("Write ready : [%p]%d", collection[i], collection[i]->sockfd);
+            collection[i]->onWrite();
             count++;
         }
     }
     return count;
 }
 
-int SelectWrapper::checkExcept(std::vector<SocketWrapper*>& collection, fd_set* fds)
+int SelectWrapper::checkExcept(std::vector<AnsycSocket*>& collection, fd_set* fds)
 {
     int count = 0;
     int size = collection.size();
     for (int i = 0; i < size; i++) {
         if (FD_ISSET(collection[i]->sockfd, fds)) {
-            LOGV("Except ready : %d", collection[i]->sockfd);
+            LOGV("Except ready : [%p]%d", collection[i], collection[i]->sockfd);
+            collection[i]->onExcept();
             count++;
         }
     }

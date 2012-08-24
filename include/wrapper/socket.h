@@ -38,10 +38,17 @@ public:
 private:
     bool setError(int ret, const char* function, int line);
     Error error;
+
+protected:
+    bool isListening;
 };
 
 class SocketListener {
 public:
+    virtual void onClientConnect(SocketWrapper* socket) = 0;
+    virtual void onReadReady(SocketWrapper* socket) = 0;
+    virtual void onWriteReady(SocketWrapper* socket) = 0;
+    
     virtual void onAccept(SocketWrapper* socket) = 0;
     virtual void onRecv(void *buf, size_t len) = 0;
     virtual void onSend(const void *buf, size_t len) = 0;
@@ -52,6 +59,10 @@ class AnsycSocket : public SocketWrapper {
 public:
     AnsycSocket(SocketListener* socketListener = NULL);
     void setSocketListener(SocketListener* socketListener);
+
+    void onRead();
+    void onWrite();
+    void onExcept();
     
 private:
     SocketListener* listener;

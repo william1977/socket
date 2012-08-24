@@ -19,6 +19,7 @@
 SocketWrapper::SocketWrapper()
 {
     sockfd = -1;
+    isListening = false;
 }
 
 bool SocketWrapper::setError(int ret, const char* function, int line)
@@ -56,6 +57,9 @@ bool SocketWrapper::listen(int backlog)
 {
     int ret = ::listen(sockfd, backlog);
     LOGV("listen(sockfd:%d, backlog:%d) return %d", sockfd, backlog, ret);
+    if(ret != -1){
+        isListening = true;
+    }
     return SET_ERROR(ret);
 }
 
@@ -124,6 +128,7 @@ bool SocketWrapper::close()
     LOGV("close(sockfd:%d) return %d", sockfd, ret);
     if(ret == 0){
         sockfd = -1;
+        isListening = false;
     }
     return SET_ERROR(ret);
 }
@@ -183,4 +188,29 @@ void AnsycSocket::setSocketListener(SocketListener* socketListener)
 {
     listener = socketListener;
 }
+
+void AnsycSocket::onRead()
+{
+    if(isListening) {
+        if (listener != NULL) {
+            listener->onClientConnect(this);
+        }  
+    } else {
+        if (listener != NULL) {
+            listener->onReadReady(this);
+        }  
+    }
+}
+
+void AnsycSocket::onWrite()
+{
+    if (listener != NULL) {
+        listener->onWriteReady(this);
+    }  
+}
+void AnsycSocket::onExcept()
+{
+
+}
+
 

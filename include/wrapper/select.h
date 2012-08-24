@@ -16,17 +16,17 @@ public:
 //    bool add(SocketWrapper*socket, bool addToRead = false, bool addToWrite = false, bool addToExpect = false);
 //    bool remove(SocketWrapper*socket, bool addToRead = false, bool addToWrite = false, bool addToExpect = false);
 
-    bool addToRead(SocketWrapper*socket);
-    bool removeFromRead(SocketWrapper*socket);
-    bool isReadable(SocketWrapper*socket);
+    bool addToRead(AnsycSocket*socket);
+    bool removeFromRead(AnsycSocket*socket);
+    bool isReadable(AnsycSocket*socket);
 
-    bool addToWrite(SocketWrapper*socket);
-    bool removeFromWrite(SocketWrapper*socket);
-    bool isWritable(SocketWrapper*socket);
+    bool addToWrite(AnsycSocket*socket);
+    bool removeFromWrite(AnsycSocket*socket);
+    bool isWritable(AnsycSocket*socket);
 
-    bool addToExcept(SocketWrapper*socket);
-    bool removeFromExcept(SocketWrapper*socket);
-    bool isExcept(SocketWrapper*socket);
+    bool addToExcept(AnsycSocket*socket);
+    bool removeFromExcept(AnsycSocket*socket);
+    bool isExcept(AnsycSocket*socket);
 
 private:
 //    int nfds;
@@ -34,16 +34,16 @@ private:
   //  fd_set writefds;
    // fd_set exceptfds;
 
-    std::vector<SocketWrapper*> reads;
-    std::vector<SocketWrapper*> writes;
-    std::vector<SocketWrapper*> excepts;
+    std::vector<AnsycSocket*> reads;
+    std::vector<AnsycSocket*> writes;
+    std::vector<AnsycSocket*> excepts;
 
-    bool add(std::vector<SocketWrapper*>& collection, SocketWrapper*socket);
-    bool remove(std::vector<SocketWrapper*>& collection, SocketWrapper*socket);
-    int getMaxfd(std::vector<SocketWrapper*>& collection, int nfds, fd_set* fds);
-    int checkRead(std::vector<SocketWrapper*>& collection, fd_set* fds);
-    int checkWrite(std::vector<SocketWrapper*>& collection, fd_set* fds);
-    int checkExcept(std::vector<SocketWrapper*>& collection, fd_set* fds);
+    bool add(std::vector<AnsycSocket*>& collection, AnsycSocket*socket);
+    bool remove(std::vector<AnsycSocket*>& collection, AnsycSocket*socket);
+    int getMaxfd(std::vector<AnsycSocket*>& collection, int nfds, fd_set* fds);
+    int checkRead(std::vector<AnsycSocket*>& collection, fd_set* fds);
+    int checkWrite(std::vector<AnsycSocket*>& collection, fd_set* fds);
+    int checkExcept(std::vector<AnsycSocket*>& collection, fd_set* fds);
 
 public:
     Error getLastError() {return error;}
