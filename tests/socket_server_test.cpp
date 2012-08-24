@@ -79,13 +79,31 @@ public:
 
     void onClientDisconnect(TestSocketListener* socketListener);
     
-    TestServerListener(SelectWrapper* select, IPSocket* socket){this->select = select; server = socket;}
-    ~TestServerListener(){}
+    TestServerListener();
+    ~TestServerListener();
+
+    void run();
 
 private:
     SelectWrapper* select;
     IPSocket* server;
 };
+
+TestServerListener::TestServerListener()
+{
+    SelectWrapper* select = new SelectWrapper();
+this->select = select; 
+IPSocket* socket = new IPSocket();
+server = socket;
+}
+TestServerListener::~TestServerListener()
+{
+    server->close();
+     delete server;
+
+    delete server;
+    delete select;
+}
 
 void TestServerListener::onClientConnect(SocketWrapper* socket)
 {
@@ -103,6 +121,25 @@ void TestServerListener::onClientConnect(SocketWrapper* socket)
    select->addToRead(client);
    //select->addToWrite(client);
    //select->addToExcept(client);
+}
+
+void TestServerListener::run()
+{
+       server->create();
+       server->setSocketListener(this);
+       server->setNonBlock();
+       
+       server->bind(8000);
+       server->listen();
+    
+       select->addToRead(server);
+    //   select->addToWrite(socket);
+    //   select->addToExcept(socket);
+    
+    for(int i = 0 ; i < 4; i ++) {
+       select->select();
+    
+       }
 }
 
 void TestServerListener::onClientDisconnect(TestSocketListener* socketListener)
@@ -141,31 +178,13 @@ void test_async_server()
 {
     _LOGV("Begin test async server\n");
 
-    SelectWrapper* select = new SelectWrapper();
+    TestServerListener * serverlistener = new TestServerListener();
 
-    IPSocket* socket = new IPSocket();
-    TestServerListener * serverlistener = new TestServerListener(select, socket);
-    socket->create();
-    socket->setSocketListener(serverlistener);
-    socket->setNonBlock();
+    serverlistener->run();
     
-    socket->bind(8000);
-    socket->listen();
 
-    select->addToRead(socket);
- //   select->addToWrite(socket);
- //   select->addToExcept(socket);
-
- for(int i = 0 ; i < 4; i ++) {
-    select->select();
-
-    }
-
-   socket->close();
-    delete socket;
     delete serverlistener;
 
-    delete select;
 
     _LOGV("End test async server\n");
 
