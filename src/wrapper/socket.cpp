@@ -21,14 +21,6 @@ SocketWrapper::SocketWrapper()
     sockfd = -1;
 }
 
-bool SocketWrapper::create(int domain, int type, int protocol)
-{
-    LOGV("construct size : %d", sizeof(SocketWrapper));
-    sockfd = socket(domain, type, protocol);
-    LOGV("socket(domain:%d, type:%d, protocol:%d) return sockfd:%d", domain, type, protocol, sockfd);
-    return SET_ERROR(sockfd);
-}
-
 bool SocketWrapper::setError(int ret, const char* function, int line)
 {
     if (ret == -1) {
@@ -43,6 +35,14 @@ bool SocketWrapper::setError(int ret, const char* function, int line)
 SocketWrapper::~SocketWrapper()
 {
     LOGV("destruct size : %d", sizeof(SocketWrapper));
+}
+
+bool SocketWrapper::create(int domain, int type, int protocol)
+{
+    LOGV("construct size : %d", sizeof(SocketWrapper));
+    sockfd = socket(domain, type, protocol);
+    LOGV("socket(domain:%d, type:%d, protocol:%d) return sockfd:%d", domain, type, protocol, sockfd);
+    return SET_ERROR(sockfd);
 }
 
 bool SocketWrapper::bind(const struct sockaddr *addr, socklen_t addrlen)
@@ -174,9 +174,9 @@ bool IPSocket::connect(const char* address, int port)
     return SocketWrapper::connect((const sockaddr*)&peer_addr, sizeof(addr));
 }
 
-AnsycSocket::AnsycSocket()
+AnsycSocket::AnsycSocket(SocketListener* socketListener)
 {
-    listener = NULL;
+    setSocketListener(socketListener);
 }
 
 void AnsycSocket::setSocketListener(SocketListener* socketListener)

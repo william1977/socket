@@ -7,6 +7,9 @@ clean :
 	rm socket_server_test socket_client_test
 
 SOURCES := ../src/wrapper/socket.o 
+SOURCES += ../src/wrapper/select.o 
+SOURCES += ../src/wrapper/poll.o 
+SOURCES += ../src/wrapper/epoll.o 
 
 socket_server_test : socket_server_test.o $(SOURCES)
 	g++ -o $@ $< $(SOURCES)

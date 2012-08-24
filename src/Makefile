@@ -7,7 +7,10 @@ clean :
 	rm libsocket.a
 
 SOURCES := wrapper/socket.o 
+SOURCES += wrapper/select.o 
+SOURCES += wrapper/poll.o 
+SOURCES += wrapper/epoll.o 
 
 libsocket : $(SOURCES)
-	ar rcs $@.a $<
+	ar rcs $@.a $(SOURCES)
 	ranlib $@.a
