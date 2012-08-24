@@ -57,36 +57,19 @@ void test_socket_server()
 
 }
 
+class TestServerListener;
 class TestSocketListener : public SocketListener{
 public:
     virtual void onClientConnect(SocketWrapper* socket){}
     virtual void onReadReady(SocketWrapper* socket) ;
     virtual void onWriteReady(SocketWrapper* socket) {}
     
-    TestSocketListener(SelectWrapper* select){this->select = select;}
+    TestSocketListener(TestServerListener* server, IPSocket* socket){this->server = server; this->socket = socket;}
+    ~TestSocketListener(){socket->close(); delete socket;}
 private:
-    SelectWrapper* select;
+    TestServerListener* server;
+    IPSocket* socket;
 };
-
-void TestSocketListener::onReadReady(SocketWrapper* socket) 
-{
-    char buf[65535];
-    memset(buf, 0, sizeof(buf));
-    ssize_t read_len;
-    bool ret = socket->recv(buf, sizeof(buf), &read_len);
-    _LOGV("Receive : [%d]\n[%s]\n", read_len, buf);
-    if(ret && read_len == 0){
-        socket->close();
-    }
-
-    const char* body = "abcd";
-    sprintf(buf, "HTTP/1.1 200 OK\r\nContent-Type: text/html; charset=UTF-8\r\nContent-Length: %d\r\n\r\n%s", strlen(body), body);
-    socket->send(buf, strlen(buf), &read_len);
-
- //   socket->recv(buf, sizeof(buf), &read_len);
- //   _LOGV("Receive : [%d]\n[%s]\n", read_len, buf);
-}
-
 
 class TestServerListener : public SocketListener{
 public:
@@ -97,22 +80,12 @@ public:
     void onClientDisconnect(TestSocketListener* socketListener);
     
     TestServerListener(SelectWrapper* select, IPSocket* socket){this->select = select; server = socket;}
-    ~TestServerListener();
+    ~TestServerListener(){}
 
 private:
-    TestSocketListener * listener;
-    IPSocket* client;
     SelectWrapper* select;
     IPSocket* server;
 };
-
-TestServerListener::~TestServerListener()
-{
-        client->close();
-        
-        delete client;
-        delete listener;
-}
 
 void TestServerListener::onClientConnect(SocketWrapper* socket)
 {
@@ -121,8 +94,8 @@ void TestServerListener::onClientConnect(SocketWrapper* socket)
         LOGE("Error : %p != %p", server, socket);
         return ;
     }
-    listener = new TestSocketListener(select);
-    client = new IPSocket();
+    IPSocket* client = new IPSocket();
+    TestSocketListener* listener = new TestSocketListener(this, client);
     server->accept(client);
     client->setSocketListener(listener);
     client->setNonBlock();
@@ -130,7 +103,38 @@ void TestServerListener::onClientConnect(SocketWrapper* socket)
    select->addToRead(client);
    //select->addToWrite(client);
    //select->addToExcept(client);
-    
+}
+
+void TestServerListener::onClientDisconnect(TestSocketListener* socketListener)
+{
+        delete socketListener;
+}
+
+void TestSocketListener::onReadReady(SocketWrapper* socket) 
+{
+    if(this->socket != socket)
+    {
+        LOGE("Error : %p != %p", this->socket, socket);
+        return ;
+    }
+
+    char buf[65535];
+    memset(buf, 0, sizeof(buf));
+    ssize_t read_len;
+    bool ret = socket->recv(buf, sizeof(buf), &read_len);
+    _LOGV("Receive : [%d]\n[%s]\n", read_len, buf);
+    if(ret && read_len == 0){
+       // socket->close();
+        server->onClientDisconnect(this);
+       return;
+    }
+
+    const char* body = "abcd";
+    sprintf(buf, "HTTP/1.1 200 OK\r\nContent-Type: text/html; charset=UTF-8\r\nContent-Length: %d\r\n\r\n%s", strlen(body), body);
+    socket->send(buf, strlen(buf), &read_len);
+
+ //   socket->recv(buf, sizeof(buf), &read_len);
+ //   _LOGV("Receive : [%d]\n[%s]\n", read_len, buf);
 }
 
 void test_async_server()
