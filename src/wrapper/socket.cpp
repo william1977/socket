@@ -7,6 +7,10 @@
 #include <netinet/in.h>
 #include <unistd.h>
 #include <fcntl.h>
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
+
 
 #include <wrapper/socket.h>
 
@@ -104,6 +108,13 @@ bool SocketWrapper::setNonBlock()
     return fcntl (F_SETFL, flags);
 }
 
+bool SocketWrapper::connect(const struct sockaddr *addr, socklen_t addrlen)
+{
+    int ret = ::connect(sockfd, addr, addrlen);
+    LOGV("connect(sockfd:%d, addr:%p, addrlen:%d) return %d", sockfd, addr, addrlen, ret);
+    return SET_ERROR(ret);
+}
+
 bool SocketWrapper::close()
 {
     if(sockfd == -1){
@@ -135,19 +146,31 @@ bool SocketWrapper::accept(SocketWrapper* socket)
     return accept(socket, (struct sockaddr *)&my_addr, &addrlen);
 }
 */
-bool IPSocket::bind(int listen_port)
+bool IPSocket::bind(int listen_port, const char* address)
 {
     memset(&addr, 0, sizeof(addr));
     addr.sin_family = AF_INET;
     addr.sin_port = htons(listen_port);
     addr.sin_addr.s_addr = INADDR_ANY;
+    if (address != NULL) {
+        addr.sin_addr.s_addr = inet_addr(address);
+    }
     return SocketWrapper::bind((const sockaddr*)&addr, sizeof(addr));
 }
 
 bool IPSocket::accept(IPSocket* socket)
 {
-    memset(&socket->addr, 0, sizeof(socket->addr));
-    socklen_t addrlen = sizeof(socket->addr);
-    return SocketWrapper::accept(socket, (struct sockaddr *)&socket->addr, &addrlen);
+    memset(&socket->peer_addr, 0, sizeof(socket->peer_addr));
+    socklen_t addrlen = sizeof(socket->peer_addr);
+    return SocketWrapper::accept(socket, (struct sockaddr *)&socket->peer_addr, &addrlen);
+}
+
+bool IPSocket::connect(const char* address, int port)
+{
+    memset(&peer_addr, 0, sizeof(peer_addr));
+    peer_addr.sin_family = AF_INET;
+    peer_addr.sin_port = htons(port);
+    peer_addr.sin_addr.s_addr = inet_addr(address);
+    return SocketWrapper::connect((const sockaddr*)&peer_addr, sizeof(addr));
 }
 
