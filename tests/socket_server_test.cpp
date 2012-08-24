@@ -1,6 +1,7 @@
 #define LOG_LEVEL LOG_VERBOSE
 #include <log.h>
 #include <wrapper/socket.h>
+#include <wrapper/select.h>
 #include <string.h>
 
 void test_socket_server()
@@ -87,6 +88,8 @@ void test_async_server()
 {
     _LOGV("Begin test async server\n");
 
+    SelectWrapper* select = new SelectWrapper();
+
     TestServerListener * serverlistener = new TestServerListener();
     IPSocket* socket = new IPSocket();
     socket->create();
@@ -95,6 +98,9 @@ void test_async_server()
     
     socket->bind(8000);
     socket->listen();
+
+    select->addToRead(socket);
+    select->select();
 
     TestSocketListener * listener = new TestSocketListener();
     IPSocket* client = new IPSocket();
@@ -118,9 +124,13 @@ void test_async_server()
     client->close();
     
     delete client;
+    delete listener;
 
     socket->close();
     delete socket;
+    delete serverlistener;
+
+    delete select;
 
     _LOGV("End test async server\n");
 

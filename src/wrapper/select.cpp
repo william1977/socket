@@ -63,7 +63,7 @@ bool SelectWrapper::select(struct timeval *timeout)
     }
 
     int ret = ::select(nfds, p_readfds, p_writefds, p_exceptfds, timeout);
-    LOGV("select(nfds:%d, readfds:%p, writefds:%p, exceptfds:%p) return %d", nfds, &readfds, &writefds, &exceptfds, ret);
+    LOGV("select(nfds:%d, readfds:%p, writefds:%p, exceptfds:%p, timeout:%p) return %d", nfds, p_readfds, p_writefds, p_exceptfds, timeout, ret);
     return SET_ERROR(ret);
 }
 
