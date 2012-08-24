@@ -6,6 +6,7 @@
 
 #include "error.h"
 
+class SocketListener;
 class SocketWrapper {
 private:
     int sockfd;
@@ -33,10 +34,21 @@ public:
 public:
     bool isValid() {return sockfd != -1;}
     Error getLastError() {return error;}
+    void setSocketListener(SocketListener* socketListener);
 
 private:
     bool setError(int ret, const char* function, int line);
     Error error;
+
+    SocketListener* listener;
+    bool async;
+};
+
+class SocketListener {
+public:
+    virtual void onAccept(SocketWrapper* socket);
+    virtual void onRecv(void *buf, size_t len);
+    virtual void onSend(const void *buf, size_t len);
 };
 
 class IPSocket : public SocketWrapper {

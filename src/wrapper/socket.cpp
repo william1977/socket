@@ -19,6 +19,8 @@
 SocketWrapper::SocketWrapper()
 {
     sockfd = -1;
+    async = false;
+    listener = NULL;
 }
 
 bool SocketWrapper::create(int domain, int type, int protocol)
@@ -105,7 +107,8 @@ bool SocketWrapper::setNonBlock()
     }
     
     flags |= O_NONBLOCK;
-    return fcntl (F_SETFL, flags);
+    async = fcntl (F_SETFL, flags);
+    return async;
 }
 
 bool SocketWrapper::connect(const struct sockaddr *addr, socklen_t addrlen)
