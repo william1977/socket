@@ -24,15 +24,15 @@ public:
     bool removeFromWrite(SocketWrapper*socket);
     bool isWritable(SocketWrapper*socket);
 
-    bool addToExpect(SocketWrapper*socket);
-    bool removeFromExpect(SocketWrapper*socket);
-    bool isExpect(SocketWrapper*socket);
+    bool addToExcept(SocketWrapper*socket);
+    bool removeFromExcept(SocketWrapper*socket);
+    bool isExcept(SocketWrapper*socket);
 
 private:
 //    int nfds;
-    fd_set readfds;
-    fd_set writefds;
-    fd_set exceptfds;
+//    fd_set readfds;
+  //  fd_set writefds;
+   // fd_set exceptfds;
 
     std::vector<SocketWrapper*> reads;
     std::vector<SocketWrapper*> writes;
@@ -40,7 +40,10 @@ private:
 
     bool add(std::vector<SocketWrapper*>& collection, SocketWrapper*socket);
     bool remove(std::vector<SocketWrapper*>& collection, SocketWrapper*socket);
-    int getMaxfd(std::vector<SocketWrapper*>& collection, int nfds);
+    int getMaxfd(std::vector<SocketWrapper*>& collection, int nfds, fd_set* fds);
+    int checkRead(std::vector<SocketWrapper*>& collection, fd_set* fds);
+    int checkWrite(std::vector<SocketWrapper*>& collection, fd_set* fds);
+    int checkExcept(std::vector<SocketWrapper*>& collection, fd_set* fds);
 
 public:
     Error getLastError() {return error;}
