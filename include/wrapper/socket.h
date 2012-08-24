@@ -7,7 +7,7 @@
 #include "error.h"
 
 class SocketWrapper {
-friend class SelectWrapper;
+    friend class SelectWrapper;
 private:
     int sockfd;
     
@@ -49,17 +49,19 @@ public:
     virtual void onReadReady(SocketWrapper* socket) = 0;
     virtual void onWriteReady(SocketWrapper* socket) = 0;
     
-    virtual void onAccept(SocketWrapper* socket) = 0;
-    virtual void onRecv(void *buf, size_t len) = 0;
-    virtual void onSend(const void *buf, size_t len) = 0;
+  //  virtual void onAccept(SocketWrapper* socket) = 0;
+  //  virtual void onRecv(void *buf, size_t len) = 0;
+  //  virtual void onSend(const void *buf, size_t len) = 0;
 };
 
 
 class AnsycSocket : public SocketWrapper {
+    friend class SelectWrapper;
 public:
     AnsycSocket(SocketListener* socketListener = NULL);
     void setSocketListener(SocketListener* socketListener);
 
+private:
     void onRead();
     void onWrite();
     void onExcept();

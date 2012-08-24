@@ -18,17 +18,18 @@ public:
 
     bool addToRead(AnsycSocket*socket);
     bool removeFromRead(AnsycSocket*socket);
-    bool isReadable(AnsycSocket*socket);
 
     bool addToWrite(AnsycSocket*socket);
     bool removeFromWrite(AnsycSocket*socket);
-    bool isWritable(AnsycSocket*socket);
 
     bool addToExcept(AnsycSocket*socket);
     bool removeFromExcept(AnsycSocket*socket);
-    bool isExcept(AnsycSocket*socket);
 
 private:
+    bool isReadable(AnsycSocket*socket);
+    bool isWritable(AnsycSocket*socket);
+    bool isExcept(AnsycSocket*socket);
+    
 //    int nfds;
 //    fd_set readfds;
   //  fd_set writefds;

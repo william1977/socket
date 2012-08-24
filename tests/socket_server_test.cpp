@@ -54,19 +54,12 @@ void test_socket_server()
 
 }
 
-
-
-
 class TestSocketListener : public SocketListener{
 public:
     virtual void onClientConnect(SocketWrapper* socket){}
     virtual void onReadReady(SocketWrapper* socket) ;
     virtual void onWriteReady(SocketWrapper* socket) {}
     
-    virtual void onAccept(SocketWrapper* socket) {}
-    virtual void onRecv(void *buf, size_t len);
-    virtual void onSend(const void *buf, size_t len);
-
     TestSocketListener(SelectWrapper* select){this->select = select;}
 private:
     SelectWrapper* select;
@@ -84,17 +77,10 @@ void TestSocketListener::onReadReady(SocketWrapper* socket)
     sprintf(buf, "HTTP/1.1 200 OK\r\nContent-Type: text/html; charset=UTF-8\r\nContent-Length: %d\r\n\r\n%s", strlen(body), body);
     socket->send(buf, strlen(buf), &read_len);
 
+ //   socket->recv(buf, sizeof(buf), &read_len);
+ //   _LOGV("Receive : [%d]\n[%s]\n", read_len, buf);
 }
 
-void TestSocketListener::onRecv(void *buf, size_t len)
-{
-
-}
-
-void TestSocketListener::onSend(const void *buf, size_t len)
-{
-
-}
 
 class TestServerListener : public SocketListener{
 public:
@@ -102,10 +88,6 @@ public:
     virtual void onReadReady(SocketWrapper* socket){}
     virtual void onWriteReady(SocketWrapper* socket){}
     
-    virtual void onAccept(SocketWrapper* socket);
-    virtual void onRecv(void *buf, size_t len) {}
-    virtual void onSend(const void *buf, size_t len) {}
-
     TestServerListener(SelectWrapper* select, IPSocket* socket){this->select = select; server = socket;}
     ~TestServerListener();
 
@@ -140,13 +122,7 @@ void TestServerListener::onClientConnect(SocketWrapper* socket)
    select->addToRead(client);
    //select->addToWrite(client);
    //select->addToExcept(client);
-   select->select();
     
-}
-
-void TestServerListener::onAccept(SocketWrapper* socket)
-{
-
 }
 
 void test_async_server()
@@ -167,18 +143,13 @@ void test_async_server()
     select->addToRead(socket);
  //   select->addToWrite(socket);
  //   select->addToExcept(socket);
+
+ for(int i = 0 ; i < 4; i ++) {
     select->select();
 
+    }
 
-    //client->recv(buf, sizeof(buf), &read_len);
-    //_LOGV("Receive : [%d]%s \n", read_len, buf);
-
- //   client->close();
-    
- //   delete client;
-//    delete listener;
-
-    socket->close();
+   socket->close();
     delete socket;
     delete serverlistener;
 
