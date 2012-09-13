@@ -1,16 +1,19 @@
-CPPFLAGS := -I ../include
+CFLAGS+= -I ../include
+CXXFLAGS+= -I ../include
+LDFLAGS+=-static
 
-all : libsocket
+TARGET=libsocket
 
-clean : 
-	find . -name "*.o" | xargs rm
-	rm libsocket.a
+all:$(TARGET) 
 
-SOURCES := wrapper/socket.o 
-SOURCES += wrapper/select.o 
-SOURCES += wrapper/poll.o 
-SOURCES += wrapper/epoll.o 
+SOURCES := wrapper/socket.o
+SOURCES += wrapper/select.o
+SOURCES += wrapper/poll.o
+SOURCES += wrapper/epoll.o
 
-libsocket : $(SOURCES)
+$(TARGET):$(SOURCES)
 	ar rcs $@.a $(SOURCES)
 	ranlib $@.a
+
+clean:
+	rm $(SOURCES) $(TARGET).a

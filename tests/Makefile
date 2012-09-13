@@ -1,18 +1,25 @@
-CPPFLAGS := -I ../include -v
+CFLAGS+= -I ../include
+CXXFLAGS+= -I ../include
+LDFLAGS+=-static
 
-all : socket_server_test socket_client_test
+TARGET1=socket_server_test
+TARGET2=socket_client_test
 
-clean : 
-	find ../ -name "*.o" | xargs rm
-	rm socket_server_test socket_client_test
+TARGETS:=$(TARGET1)
+TARGETS+=$(TARGET2)
+all:compile $(TARGETS)
 
-SOURCES := ../src/wrapper/socket.o 
-SOURCES += ../src/wrapper/select.o 
-SOURCES += ../src/wrapper/poll.o 
-SOURCES += ../src/wrapper/epoll.o 
+SOURCES := ../src/wrapper/socket.o
+SOURCES += ../src/wrapper/select.o
+SOURCES += ../src/wrapper/poll.o
+SOURCES += ../src/wrapper/epoll.o
 
-socket_server_test : socket_server_test.o $(SOURCES)
-	$(CXX) -static -v -o $@ $< $(SOURCES)
+$(TARGET1):$(SOURCES) $(TARGET1).o
+$(TARGET2):$(SOURCES) $(TARGET2).o
 
-socket_client_test : socket_client_test.o $(SOURCES)
-	$(CXX)  -static -v -o $@ $< $(SOURCES)
+TARGETSOBJ:=$(TARGET1).o
+TARGETSOBJ+=$(TARGET2).o
+compile:$(SOURCES) $(TARGETSOBJ)
+
+clean:
+	rm $(TARGETSOBJ) $(TARGETS)
