@@ -1,1 +1,1 @@
-CC=/bin/g++ CXX=/bin/g++ make
+CC=g++ CFLAGS=-v CXXFLAGS=-v LDFLAGS=-v make
