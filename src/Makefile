@@ -1,6 +1,6 @@
 CFLAGS+= -I ../include
 CXXFLAGS+= -I ../include
-LDFLAGS+=-static
+#LDFLAGS+=-static
 
 TARGET=libsocket
 
