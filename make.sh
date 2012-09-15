@@ -1,1 +1,1 @@
-CC=g++ make
+CC=/bin/g++ CXX=/bin/g++ make
