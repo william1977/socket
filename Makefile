@@ -7,4 +7,4 @@ all: $(dirs)
 clean: $(dirs)
 
 $(dirs):
-	$(MAKE) -j2 -C $@ $(MAKECMDGOALS)
+	$(MAKE) -C $@ $(MAKECMDGOALS)
