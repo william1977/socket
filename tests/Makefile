@@ -1,6 +1,6 @@
 CFLAGS+= -I ../include
 CXXFLAGS+= -I ../include
-LDFLAGS+=-static
+LDFLAGS+=-static -lstdc++
 
 TARGET1=socket_server_test
 TARGET2=socket_client_test
