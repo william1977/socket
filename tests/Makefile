@@ -14,7 +14,7 @@ SOURCES += ../src/wrapper/select.o
 SOURCES += ../src/wrapper/poll.o
 SOURCES += ../src/wrapper/epoll.o
 
-$(TARGETS):$(SOURCES) $(TARGETSOBJ)
+$(TARGETS):$(SOURCES)
 
 TARGETSOBJ:=$(TARGET1).o
 TARGETSOBJ+=$(TARGET2).o
