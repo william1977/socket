@@ -5,16 +5,14 @@
 TARGET1=main1
 TARGET2=main2
 
-#TARGETS:=$(TARGET1)
-#TARGETS+=$(TARGET2)
-
-SOURCES:=testcpp.o
-SOURCES+=testc.o
+TARGETS:=$(TARGET1)
+TARGETS+=$(TARGET2)
 
 TARGETSOBJ:=$(TARGET1).o
 TARGETSOBJ+=$(TARGET2).o
-TARGETS=`echo "$(TARGETSOBJ)" | sed 's/.o//g'`
-#TARGETSOBJ=`echo "$(TARGETS)" | sed 's/ /.o /g'`
+
+SOURCES:=testcpp.o
+SOURCES+=testc.o
 
 all:prep compile $(TARGETS)
 $(TARGETS):$(SOURCES)
@@ -24,7 +22,8 @@ clean:
 	rm $(SOURCES) $(TARGETSOBJ) $(TARGETS)
 
 prep:
-	echo $(TARGETSOBJ)
 	echo $(TARGETS)
+	echo $(TARGETSOBJ)
+	echo $(SOURCES)
 	echo "begin make ......"
 
