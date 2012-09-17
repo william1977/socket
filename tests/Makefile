@@ -19,7 +19,7 @@ $(TARGET1):$(TARGET1).o $(SOURCES)
 $(TARGET2):$(TARGET2).o $(SOURCES)
 
 clean:
-	rm $(SOURCES) $(TARGETS)
+	rm $(TARGETS)
 	echo $(TARGETOBJS) | xargs rm
 
 prep:
